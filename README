@@ -1,13 +1,18 @@
 InfiniBand Visualization with D3.js
-beta-version
 =====================================
 
-v1.0b April 29, 2015
+v1.0 April 29, 2015
 
 Copyright 2015 Blake Caldwell
 Oak Ridge National Laboratory
 
 This program is licensed under GNU GPLv3. Full license in LICENSE
+
+=====================================
+Example visualizations from University of Colorado JANUS Supercomputer:
+
+http://bl.ocks.org/caldweba/ab08c6e78058fe2b7fcf
+http://bl.ocks.org/caldweba/ab483405698b463d3a94
 
 =====================================
 Installation
