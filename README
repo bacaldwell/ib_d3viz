@@ -1,0 +1,124 @@
+InfiniBand Visualization with D3.js
+beta-version
+=====================================
+
+v1.0b April 29, 2015
+
+Copyright 2015 Blake Caldwell
+Oak Ridge National Laboratory
+
+This program is licensed under GNU GPLv3. Full license in LICENSE
+
+=====================================
+Installation
+
+1. Starting node js server
+
+If you are doing development work locally, you'll want to start a node.js server. This simple
+example starts serving the current directory on port 8080.
+
+In server.js:
+
+var connect = require('connect');
+var serveStatic = require('serve-static');
+connect().use(serveStatic(__dirname)).listen(8080);
+
+
+2. Starting node web server
+
+$ node server.js
+
+
+3. D3.js binaries (optional)
+
+In your html files, you can refer to the D3.js code from d3js.org or copy it locally. I chose to
+copy it locally.
+
+Remote (in html):
+  <script src="http://d3js.org/d3.v3.js"></script>
+
+Local:
+mkdir d3 && cd d3
+wget http://d3js.org/d3.v3.js
+
+=====================================
+Dependencies
+
+Creating a dot visualization requires the following Python libraries:
+
+pydot-1.0.28
+https://pypi.python.org/pypi/pydot
+
+pyparsing-1.5.7
+https://pypi.python.org/pypi/pyparsing/1.5.7
+
+Extract the tarballs in the same directory as ib_topology_graph.py
+
+=====================================
+Customization
+
+1. Define string for leaf switches. For example:
+
+"Infiniscale-IV Mellanox Technologies"
+
+Then define the replacement string. The script uses:
+"Mellanox TOR"
+
+
+2. Regular expressions to identify line and spine modules
+  in a chassis switched. For example:
+
+core_pattern=".*MellanoxIS5600-([0-9])+.*"
+spine_pattern=".*(MellanoxIS5600-[0-9]+).*\/S([0-9]+)\/.*"
+line_pattern=".*(MellanoxIS5600-[0-9]+).*\/L([0-9]+)\/.*"
+
+
+3. The --cluster option is not fully implemented, as it is site-specifc. You'll
+  see in the code
+        #    cluster_XXX=pydot.Cluster('yyyy',label="zzz")
+
+You'll want to replace all XXX yyyy and zzz strings respectively in the code and uncomment
+the lines. This hasn't been tested in recent versions, so please report any issues you
+encounter
+
+
+=====================================
+Usage
+
+Collect output from ibnetdiscover -p. Use --node-name-map for modifying the description
+provided by the HC
+
+$ ibnetdiscover -p --node-name-map > fabric_ibnetdisc.out
+$ cat fabric_ibnetdisc.out 
+
+CA   392  1 0x0002c90300086c07 4x QDR - SW  1495 36 0x0002c90200419bf0 ( 'node0570 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   379  1 0x0002c9030008561f 4x QDR - SW  1495 35 0x0002c90200419bf0 ( 'node0569 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   406  1 0x0002c90300085617 4x QDR - SW  1495 34 0x0002c90200419bf0 ( 'node0568 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   374  1 0x0002c90300085513 4x QDR - SW  1495 33 0x0002c90200419bf0 ( 'node0567 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   370  1 0x0002c903000855cf 4x QDR - SW  1495 32 0x0002c90200419bf0 ( 'node0566 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   355  1 0x0002c903000854b7 4x QDR - SW  1495 31 0x0002c90200419bf0 ( 'node0565 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   380  1 0x0002c9030008545b 4x QDR - SW  1495 30 0x0002c90200419bf0 ( 'node0564 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   396  1 0x0002c90300085af3 4x QDR - SW  1495 29 0x0002c90200419bf0 ( 'node0563 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA   378  1 0x0002c903000855d7 4x QDR - SW  1495 28 0x0002c90200419bf0 ( 'node0562 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+CA  1571  1 0x0002c90300086bbb 4x QDR - SW  1495 27 0x0002c90200419bf0 ( 'node0561 HCA-1' - 'Infiniscale-IV Mellanox Technologies' )
+...
+
+$ python ib_topology_graph.py --help
+Couldn't import dot_parser, loading of dot files will not be possible.
+Usage: ib_topology_graph.py [-pvh] [-c cluster] [-o output_dir] [-t tree_file] [-g graph_file] [-d dot_file] ibnetdiscover_file [ ibqueryerrors_file ]
+
+Options:
+  -h, --help            show this help message and exit
+  -c CLUSTER, --cluster=CLUSTER
+                        Color highlight a cluster
+  -o OUTPUT, --output-dir=OUTPUT
+                        Image output directory
+  -d, --dot             Generate graphviz (DOT) diagram
+  -t TREE, --tree=TREE  Generate JSON tree
+  -g GRAPH, --graph=GRAPH
+                        Generate JSON graph
+  -p, --print           print topology to stdout
+  -v, --verbose         Be verbose
+
+$ python ib_topology_graph.py -t fabric_tree.out fabric_ibnetdisc.out
+$ python ib_topology_graph.py -g fabric_graph.out fabric_ibnetdisc.out
